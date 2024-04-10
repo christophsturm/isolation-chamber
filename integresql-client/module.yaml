@@ -1,0 +1,15 @@
+product:
+  type: lib
+  platforms:
+    - jvm
+dependencies:
+  - com.christophsturm.restaurant:restaurant-client:0.0.10
+  - dev.failgood:failgood:0.9.1
+  - com.christophsturm.restaurant:restaurant-core:0.0.10
+  - org.jboss.xnio:xnio-nio:3.8.13.Final
+  - org.jboss.xnio:xnio-api:3.8.13.Final
+
+settings:
+  kotlin:
+    version: 1.9
+    serialization: json

@@ -1,0 +1,61 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    name: test-on-${{matrix.java}}
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        env:
+          POSTGRES_DB: "development"
+          POSTGRES_USER: "dbuser"
+          POSTGRES_PASSWORD: "dbpass"
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+      integresql:
+        image: ghcr.io/allaboutapps/integresql:v1.1.0
+        env:
+          PGHOST: "postgres"
+          PGUSER: "dbuser"
+          PGPASSWORD: "dbpass"
+        ports:
+          - 5000:5000
+
+    strategy:
+      matrix:
+        java: [ 17, 21 ]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin' # See 'Supported distributions' for available options
+          java-version: ${{ matrix.java }}
+      - name: Cache Gradle packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.gradle/caches
+          key: "${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle.kts') }}"
+          restore-keys: ${{ runner.os }}-gradle
+      - name: Build with Gradle
+        env:
+          CI: true
+        run: |
+          ./gradlew check build
+#      - name: Test Report ${{matrix.java}}
+#        uses: ScaCap/action-surefire-report@v1.0.5
+#        with:
+#          check_name: Test Report ${{matrix.java}}
+#          report_paths: '**/build/test-results/test/TEST-*.xml'
+#          fail_on_test_failures: true
+#         fail_if_no_tests: false
+#        github_token: ${{ secrets.GITHUB_TOKEN }}
