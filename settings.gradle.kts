@@ -34,3 +34,9 @@ plugins {
   id("org.jetbrains.amper.settings.plugin").version("0.2.2")
 }
 
+dependencyResolutionManagement {
+  repositories {
+    mavenCentral()
+  }
+  repositoriesMode = RepositoriesMode.PREFER_SETTINGS
+}
