@@ -14,5 +14,4 @@ test-dependencies:
 settings:
   kotlin:
     languageVersion: 1.9
-    serialization: json
   junit: junit-5
