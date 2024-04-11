@@ -9,24 +9,13 @@ pluginManagement {
       }
     }
     gradlePluginPortal()
-    maven("https://maven.pkg.jetbrains.space/public/p/amper/amper") {
-      content {
-        includeGroupAndSubgroups("org.jetbrains.amper")
-      }
-    }
+    maven("https://maven.pkg.jetbrains.space/public/p/amper/amper")
     maven("https://www.jetbrains.com/intellij-repository/releases") {
       content {
         includeGroup("com.jetbrains.intellij.platform")
       }
     }
-    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies") {
-      content {
-        includeModule("com.jetbrains", "jbr-api")
-        includeModule("org.sqlite", "native")
-        includeGroup("com.github.weisj")
-        includeGroupAndSubgroups("org.jetbrains.intellij.deps")
-      }
-    }
+    maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
   }
 }
 
