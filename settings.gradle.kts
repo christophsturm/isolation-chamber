@@ -13,4 +13,3 @@ plugins {
   id("org.jetbrains.amper.settings.plugin").version("0.2.2")
 }
 
-//includeBuild("../restaurant")
