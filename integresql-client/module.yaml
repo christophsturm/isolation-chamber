@@ -3,8 +3,8 @@ product:
   platforms:
     - jvm
 dependencies:
-  - com.christophsturm.restaurant:restaurant-client:0.0.10
-  - com.christophsturm.restaurant:restaurant-core:0.0.10
+  - com.christophsturm.restaurant:restaurant-client:0.0.11
+  - com.christophsturm.restaurant:restaurant-core:0.0.11
 test-dependencies:
   - dev.failgood:failgood:0.9.1
   - $kotlin-test

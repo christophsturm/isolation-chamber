@@ -3,19 +3,21 @@ package com.christophsturm.isolationchamber.integresql
 import java.util.concurrent.ConcurrentHashMap
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import restaurant.HttpStatus
+import restaurant.client.HttpClientConfig
 import restaurant.client.Java11HttpClient
+import kotlin.time.Duration.Companion.seconds
 
 class IntegresqlClientException(message: String, cause: Throwable? = null) :
     RuntimeException(message, cause)
 
 class IntegresqlClient(config: Config) {
-    private val client = Java11HttpClient()
-    private val baseUrl = config.baseUrl
+    private val client = Java11HttpClient(HttpClientConfig(config.baseUrl, timeout = 20.seconds))
     private val hostIsLocalHost = config.hostIsLocalHost
     private val knownHashes = ConcurrentHashMap.newKeySet<String>()!!
     private val inProgress = ConcurrentHashMap<String, CompletableDeferred<Unit>>()
@@ -34,7 +36,7 @@ class IntegresqlClient(config: Config) {
                 val deferred = CompletableDeferred<Unit>()
                 inProgress.put(hashCode, deferred)
                 val templateResponse =
-                    client.send("$baseUrl/api/v1/templates") { // language=JSON
+                    client.send("/api/v1/templates") { // language=JSON
                         post("""{"hash":"$hashCode"}""")
                         addHeader("Content-Type", "application/json")
                     }
@@ -52,7 +54,7 @@ class IntegresqlClient(config: Config) {
                     }
 
                     val finalizeTemplateResponse =
-                        client.send("$baseUrl/api/v1/templates/$hashCode") { put() }
+                        client.send("/api/v1/templates/$hashCode") { put() }
                     if (!finalizeTemplateResponse.isOk) {
                         throw IntegresqlClientException(
                             "unexpected response $finalizeTemplateResponse"
@@ -70,17 +72,17 @@ class IntegresqlClient(config: Config) {
             // because it is not finished
             knownHashes.remove(hashCode)
             inProgress.remove(hashCode)
-            client.send("$baseUrl/api/v1/templates/$hashCode") { delete() }
+            client.send("/api/v1/templates/$hashCode") { delete() }
             throw e
         }
-        var getResponse = client.send("$baseUrl/api/v1/templates/$hashCode/tests")
+        var getResponse = client.send("/api/v1/templates/$hashCode/tests")
         // if we did not call the template api because of a known hash, the init could still be in
         // progress,
         // so we retry the get if it fails.
         if (getResponse.statusCode == HttpStatus.NOT_FOUND_404) {
             if (seenBefore) {
                 inProgress[hashCode]?.await()
-                getResponse = client.send("$baseUrl/api/v1/templates/$hashCode/tests")
+                getResponse = client.send("/api/v1/templates/$hashCode/tests")
             }
             if (getResponse.statusCode == HttpStatus.NOT_FOUND_404)
                 throw IntegresqlClientException(
@@ -107,9 +109,9 @@ class IntegresqlClient(config: Config) {
 
     suspend fun cleanUp() {
         coroutineScope {
-            returnedTestDatabases.forEach { (hash, id) ->
-                async { client.send("$baseUrl/api/v1/templates/$hash/tests/$id") { delete() } }
-            }
+            returnedTestDatabases.map { (hash, id) ->
+                async { client.send("/api/v1/templates/$hash/tests/$id") { delete() } }
+            }.awaitAll()
         }
     }
 
