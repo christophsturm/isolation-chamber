@@ -2,6 +2,7 @@ pluginManagement {
   repositories {
     mavenCentral()
     google {
+      @Suppress("UnstableApiUsage")
       content {
         includeGroupAndSubgroups("com.android")
         includeGroupAndSubgroups("com.google.testing.platform")
@@ -24,8 +25,10 @@ plugins {
 }
 
 dependencyResolutionManagement {
+  @Suppress("UnstableApiUsage")
   repositories {
     mavenCentral()
   }
+  @Suppress("UnstableApiUsage")
   repositoriesMode = RepositoriesMode.PREFER_SETTINGS
 }
