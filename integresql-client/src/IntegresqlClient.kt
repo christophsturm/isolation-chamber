@@ -100,12 +100,15 @@ class IntegresqlClient(config: Config) {
         else db
     }
 
-    private fun <T> deserialize(deserializer: KSerializer<T>, string: String) =
-        try {
+    private fun <T> deserialize(deserializer: KSerializer<T>, string: String): T {
+        if (string.isEmpty())
+            throw IntegresqlClientException("unexpected empty response")
+        return try {
             Json.decodeFromString(deserializer, string)
         } catch (e: SerializationException) {
-            throw IntegresqlClientException("unexpected response $string", e)
+            throw IntegresqlClientException("unexpected response: $string", e)
         }
+    }
 
     suspend fun cleanUp() {
         coroutineScope {
