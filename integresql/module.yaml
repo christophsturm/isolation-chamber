@@ -3,8 +3,8 @@ product:
   platforms:
     - jvm
 dependencies:
-  - ../core
-  - ../integresql-client
+  - ../core: exported
+  - ../integresql-client: exported
   - io.vertx:vertx-lang-kotlin-coroutines:4.5.8
   - io.vertx:vertx-pg-client:4.5.8
   - com.ongres.scram:client:2.1
