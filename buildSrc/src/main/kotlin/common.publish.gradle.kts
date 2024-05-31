@@ -1,5 +1,4 @@
 import org.gradle.api.publish.maven.MavenPublication
-import org.gradle.kotlin.dsl.java
 import org.gradle.kotlin.dsl.`maven-publish`
 import org.gradle.kotlin.dsl.signing
 
@@ -10,8 +9,6 @@ plugins {
 
 group = "com.christophsturm.isolationchamber"
 version = "0.0.1"
-
-val pub = "kotlinMultiplatform"
 
 val javadocJar by tasks.registering(Jar::class) {
     archiveClassifier.set("javadoc")

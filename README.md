@@ -6,8 +6,8 @@ The fastest way to get isolated databases for your tests. Currently supports cre
 This project is currently moving from into this repository from a monorepo. It should be perfectly usable even if the build is pretty new. Docs are also missing. 
 
 ### testing
-for now you have to run the docker-compose.yml file before running the
-test suite.
+please run the docker-compose.yml file before running the
+test suite. 
 
 ### api
 call PostgresqlFactory.preparePostgresDB with an optional schema to get an isolated database with that schema applied.

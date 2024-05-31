@@ -5,8 +5,6 @@ product:
 dependencies:
   - com.christophsturm.restaurant:restaurant-client:0.0.10
   - com.christophsturm.restaurant:restaurant-core:0.0.10
-  - org.jboss.xnio:xnio-nio:3.8.13.Final
-  - org.jboss.xnio:xnio-api:3.8.13.Final
 test-dependencies:
   - dev.failgood:failgood:0.9.1
   - $kotlin-test
