@@ -20,7 +20,8 @@ class IntegresqlClientTest {
             val getTemplatesRequest = CompletableDeferred<Request>()
             val databaseConfig =
                 DatabaseConfig("host", 123, "username", "password", "database", mapOf())
-            val database = Database("1234", databaseConfig)
+            val hashCode = "1234567890abcdef1234567890abcdef"
+            val database = Database(hashCode, databaseConfig)
             val mock = Restaurant {
                 route(Method.POST, "/api/v1/templates") { request, _ ->
                     postTemplatesRequest.complete(request)
@@ -31,8 +32,8 @@ class IntegresqlClientTest {
                         )
                     )
                 }
-                route(Method.PUT, "/api/v1/templates/1234") { _, _ -> response() }
-                route(Method.GET, "/api/v1/templates/1234/tests") { request, _ ->
+                route(Method.PUT, "/api/v1/templates/$hashCode") { _, _ -> response() }
+                route(Method.GET, "/api/v1/templates/$hashCode/tests") { request, _ ->
                     getTemplatesRequest.complete(request)
                     response(
                         Json.encodeToString(TestDatabase.serializer(), TestDatabase(1234, database))
@@ -42,17 +43,17 @@ class IntegresqlClientTest {
             test("happy path: calls the init callback and returns a test database") {
                 val databaseConfigDeferred = CompletableDeferred<DatabaseConfig>()
                 println(mock.baseUrl)
-                IntegresqlClient(IntegresqlClient.Config(mock.baseUrl)).dbForHash("1234") { db ->
+                IntegresqlClient(IntegresqlClient.Config(mock.baseUrl)).dbForHash(hashCode) { db ->
                     databaseConfigDeferred.complete(db)
                 }
                 assert(withTimeout(1.seconds) { databaseConfigDeferred.await() } == databaseConfig)
             }
             test("does not post to the template endpoint for a known hash") {
                 val integresqlClient = IntegresqlClient(IntegresqlClient.Config(mock.baseUrl))
-                integresqlClient.dbForHash("1234") {}
+                integresqlClient.dbForHash(hashCode) {}
                 postTemplatesRequest = CompletableDeferred()
                 val databaseConfigDeferred = CompletableDeferred<DatabaseConfig>()
-                integresqlClient.dbForHash("1234") { databaseConfigDeferred.complete(it) }
+                integresqlClient.dbForHash(hashCode) { databaseConfigDeferred.complete(it) }
                 assert(!databaseConfigDeferred.isCompleted)
                 assert(!postTemplatesRequest.isCompleted)
             }
