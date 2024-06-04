@@ -30,6 +30,8 @@ class IntegresqlClient(config: Config) {
         hashCode: String,
         dbInitFunction: suspend (DatabaseConfig) -> Unit
     ): TestDatabase {
+        if (hashCode.length != 32)
+            throw IllegalArgumentException("it seems integresql only supports hash codes with length 32")
         val seenBefore = !knownHashes.add(hashCode)
         try {
             if (!seenBefore) {

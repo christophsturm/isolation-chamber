@@ -10,6 +10,7 @@ jobs:
       postgres:
         image: postgres
         env:
+          INTEGRESQL_LOGGER_LEVEL: "info"
           POSTGRES_DB: "development"
           POSTGRES_USER: "dbuser"
           POSTGRES_PASSWORD: "dbpass"
