@@ -5,6 +5,7 @@ product:
 dependencies:
   - com.christophsturm.restaurant:restaurant-client:0.0.12
   - com.christophsturm.restaurant:restaurant-core:0.0.12
+  - org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.1
 test-dependencies:
   - dev.failgood:failgood:0.9.1
   - $kotlin-test
