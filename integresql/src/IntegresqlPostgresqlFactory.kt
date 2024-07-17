@@ -1,3 +1,4 @@
+package com.christophsturm.isolationchamber.integresql
 import com.christophsturm.isolationchamber.PostgresDb
 import com.christophsturm.isolationchamber.PostgresqlFactory
 import com.christophsturm.isolationchamber.integresql.DatabaseConfig

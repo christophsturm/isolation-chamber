@@ -1,3 +1,5 @@
+package com.christophsturm.isolationchamber.integresql
+
 import com.christophsturm.isolationchamber.PostgresDb
 import failgood.Test
 import failgood.testsAbout
