@@ -11,6 +11,6 @@ test-dependencies:
   - $kotlin-test
 settings:
   kotlin:
-    languageVersion: 1.9
+    languageVersion: 2.0
     serialization: json
   junit: junit-5

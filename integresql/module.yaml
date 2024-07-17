@@ -13,5 +13,5 @@ test-dependencies:
   - $kotlin-test
 settings:
   kotlin:
-    languageVersion: 1.9
+    languageVersion: 2.0
   junit: junit-5
