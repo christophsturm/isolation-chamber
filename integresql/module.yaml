@@ -5,8 +5,8 @@ product:
 dependencies:
   - ../core: exported
   - ../integresql-client: exported
-  - io.vertx:vertx-lang-kotlin-coroutines:4.5.8
-  - io.vertx:vertx-pg-client:4.5.8
+  - io.vertx:vertx-lang-kotlin-coroutines:4.5.9
+  - io.vertx:vertx-pg-client:4.5.9
   - com.ongres.scram:client:2.1
 test-dependencies:
   - dev.failgood:failgood:0.9.1
