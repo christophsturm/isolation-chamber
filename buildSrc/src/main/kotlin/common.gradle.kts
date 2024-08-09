@@ -1,10 +1,15 @@
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.`maven-publish`
 import org.gradle.kotlin.dsl.signing
+import com.adarshr.gradle.testlogger.TestLoggerExtension
+import com.adarshr.gradle.testlogger.theme.ThemeType.MOCHA_PARALLEL
 
 plugins {
     `maven-publish`
     signing
+    id("com.adarshr.test-logger")
+    id("com.ncorti.ktfmt.gradle")
+    kotlin("plugin.power-assert")
 }
 
 group = "com.christophsturm.isolationchamber"
@@ -53,3 +58,17 @@ signing {
 tasks.getByName("publishJvmPublicationToSonatypeRepository").dependsOn(tasks.getByName("signKotlinMultiplatformPublication")).dependsOn(tasks.getByName("signJvmPublication"))
 tasks.getByName("publishKotlinMultiplatformPublicationToSonatypeRepository").dependsOn(tasks.getByName("signKotlinMultiplatformPublication")).dependsOn(tasks.getByName("signJvmPublication"))
 
+configure<TestLoggerExtension> {
+    theme = MOCHA_PARALLEL
+    showSimpleNames = true
+    showFullStackTraces = true
+}
+@Suppress("OPT_IN_USAGE")
+powerAssert {
+    functions = listOf(
+        "kotlin.assert",
+        "kotlin.test.assertTrue",
+        "kotlin.test.assertNotNull",
+        "failgood.softly.AssertDSL.assert"
+    )
+}

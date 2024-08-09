@@ -1,4 +1,4 @@
 plugins {
-    id("common.publish")
+    id("common")
 }
 
