@@ -32,3 +32,7 @@ dependencyResolutionManagement {
   @Suppress("UnstableApiUsage")
   repositoriesMode = RepositoriesMode.PREFER_SETTINGS
 }
+include("core")
+include("integresql")
+include("integresql-client")
+include("postgresql-docker")
