@@ -12,7 +12,7 @@ import io.vertx.sqlclient.PoolOptions
 import java.util.concurrent.ConcurrentHashMap
 
 class IntegresqlPostgresqlFactory(
-    clientConfig: IntegresqlClient.Config = IntegresqlClient.Config("http://localhost:5000", true)
+    clientConfig: IntegresqlClient.Config = IntegresqlClient.Config("http://localhost:5001", true)
 ) : PostgresqlFactory {
     val vertx = Vertx.vertx()
     val integresqlClient = IntegresqlClient(clientConfig)

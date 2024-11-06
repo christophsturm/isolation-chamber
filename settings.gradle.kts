@@ -1,27 +1,16 @@
 pluginManagement {
   repositories {
     mavenCentral()
-    google {
-      @Suppress("UnstableApiUsage")
-      content {
-        includeGroupAndSubgroups("com.android")
-        includeGroupAndSubgroups("com.google.testing.platform")
-        includeGroupAndSubgroups("androidx.databinding")
-      }
-    }
+    google()
     gradlePluginPortal()
     maven("https://packages.jetbrains.team/maven/p/amper/amper")
-    maven("https://www.jetbrains.com/intellij-repository/releases") {
-      content {
-        includeGroup("com.jetbrains.intellij.platform")
-      }
-    }
+    maven("https://www.jetbrains.com/intellij-repository/releases")
     maven("https://packages.jetbrains.team/maven/p/ij/intellij-dependencies")
   }
 }
 
 plugins {
-  id("org.jetbrains.amper.settings.plugin").version("0.4.0")
+  id("org.jetbrains.amper.settings.plugin").version("0.5.0")
 }
 
 dependencyResolutionManagement {

@@ -11,7 +11,7 @@ import kotlinx.coroutines.joinAll
 class IntegresqlFunctionalTest {
     val tests = tests {
         test("it works under load") {
-            val client = IntegresqlClient(IntegresqlClient.Config("http://localhost:5000"))
+            val client = IntegresqlClient(IntegresqlClient.Config("http://localhost:5001"))
             coroutineScope {
                 (1..50).map {async {client.dbForHash(generateRandomHexString()) {} }}.joinAll()
                 client.cleanUp()
