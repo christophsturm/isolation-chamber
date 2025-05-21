@@ -10,7 +10,7 @@ dependencies:
   - com.ongres.scram:client:2.1
 test-dependencies:
   - dev.failgood:failgood:0.9.1
-  - $kotlin-test
+  - $kotlin.test
 settings:
   kotlin:
     languageVersion: 2.0
