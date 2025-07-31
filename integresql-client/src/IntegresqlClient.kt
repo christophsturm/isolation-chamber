@@ -12,9 +12,12 @@ import restaurant.HttpStatus
 import restaurant.client.HttpClientConfig
 import restaurant.client.Java11HttpClient
 import kotlin.time.Duration.Companion.seconds
+import io.github.oshai.kotlinlogging.KotlinLogging
 
 class IntegresqlClientException(message: String, cause: Throwable? = null) :
     RuntimeException(message, cause)
+
+private val logger = KotlinLogging.logger {}
 
 class IntegresqlClient(config: Config) {
     private val client = Java11HttpClient(HttpClientConfig(config.baseUrl, timeout = 20.seconds))
@@ -72,6 +75,7 @@ class IntegresqlClient(config: Config) {
         } catch (e: IntegresqlClientException) {
             // if this block throws an error we try to recover, and we delete the template db
             // because it is not finished
+            logger.error(e) { "Error during template creation for hash $hashCode, removing from known hashes and deleting incomplete template" }
             knownHashes.remove(hashCode)
             inProgress.remove(hashCode)
             client.send("/api/v1/templates/$hashCode") { delete() }

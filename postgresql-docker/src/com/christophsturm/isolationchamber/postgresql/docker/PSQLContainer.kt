@@ -9,6 +9,9 @@ import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.measureTimedValue
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import io.github.oshai.kotlinlogging.KotlinLogging
+
+private val logger = KotlinLogging.logger {}
 
 class DockerPostgresqlFactory(
     val dockerImage: String,
@@ -117,8 +120,8 @@ private class PostgresqlContainer(
         testDatabases.forEach { dbName ->
             try {
                 pool.query("DROP DATABASE IF EXISTS $dbName").execute().coAwait()
-            } catch (_: Exception) {
-                // Ignore errors during cleanup
+            } catch (e: Exception) {
+                logger.error(e) { "Failed to drop database $dbName during cleanup" }
             }
         }
         testDatabases.clear()

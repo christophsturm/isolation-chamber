@@ -82,6 +82,7 @@ The project maintains both Gradle and Amper build configurations:
 - **Amper**: Experimental build system with simpler YAML-based configuration
 - Amper build outputs are in `.amper/build/`
 - Amper modules are defined in `project.yaml` and individual `module.yaml` files
+- **Important**: When working with Amper, refer to `amper.llms-full.md` for comprehensive documentation about the Amper build system
 
 ## Infrastructure Requirements
 
@@ -120,6 +121,24 @@ PostgresqlFactory.cleanUp()
   - Good: `assert(hasTable) { "Table 'users' not found. Available tables: $tableList" }` (adds context)
   - Bad: `assert(count == 1L) { "Expected 1 but got $count" }` (redundant with assertion failure)
 - When testing template databases, use unique schemas with timestamps to avoid test interference
+
+### Resource Management in Tests
+
+Failgood provides the `autoClose` function for automatic resource management. Use it for any `AutoCloseable` resources:
+
+```kotlin
+// For AutoCloseable resources (e.g., database connections)
+val db = autoClose(factory.preparePostgresDB(schema))
+// db will be automatically closed when the test completes
+
+// For non-AutoCloseable resources, provide a custom cleanup function
+val resource = autoClose(createResource()) { resource.cleanup() }
+
+// For resources that need async cleanup (e.g., Vert.x SQL clients)
+val client = autoClose(connectToDb(...)) { it.close().coAwait() }
+```
+
+This ensures resources are properly cleaned up even if the test fails, preventing resource leaks.
 
 ## Publishing
 
