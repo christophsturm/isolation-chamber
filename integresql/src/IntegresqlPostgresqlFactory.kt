@@ -1,6 +1,7 @@
 package com.christophsturm.isolationchamber.integresql
 import com.christophsturm.isolationchamber.PostgresDb
 import com.christophsturm.isolationchamber.PostgresqlFactory
+import com.christophsturm.isolationchamber.SchemaHasher
 import com.christophsturm.isolationchamber.integresql.DatabaseConfig
 import com.christophsturm.isolationchamber.integresql.IntegresqlClient
 import com.christophsturm.isolationchamber.integresql.TestDatabase
@@ -26,7 +27,7 @@ class IntegresqlPostgresqlFactory(
 
     override suspend fun preparePostgresDB(schema: String?): PostgresDb {
         val testDatabase: TestDatabase =
-            integresqlClient.dbForHash(getHash(schema)) { c: DatabaseConfig ->
+            integresqlClient.dbForHash(SchemaHasher.getHash(schema)) { c: DatabaseConfig ->
                 if (schema != null) {
 
                     val connectOptions =
@@ -55,15 +56,6 @@ class IntegresqlPostgresqlFactory(
             config.username,
             config.password
         )
-    }
-
-    companion object {
-        @OptIn(ExperimentalStdlibApi::class)
-        internal fun getHash(schema: String?): String {
-            if (schema == null) return "1234567890abcdef1234567890abcdef"
-            val hexString = schema.hashCode().toHexString()
-            return hexString + hexString + hexString + hexString
-        }
     }
 }
 

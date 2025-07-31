@@ -1,6 +1,7 @@
 package com.christophsturm.isolationchamber.integresql
 
 import com.christophsturm.isolationchamber.PostgresDb
+import com.christophsturm.isolationchamber.SchemaHasher
 import failgood.Test
 import failgood.testsAbout
 
@@ -9,7 +10,7 @@ class IntegresqlPostgresqlFactoryTest {
     val tests =
         testsAbout(IntegresqlPostgresqlFactory::class) {
             test("hash is 32 chars long") {
-                val hash = IntegresqlPostgresqlFactory.getHash("mystring")
+                val hash = SchemaHasher.getHash("mystring")
                 assert(hash.length == 32)
                 assert(hash.toCharArray().all { it.isLowerCase() || it.isDigit() })
             }

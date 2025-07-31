@@ -2,9 +2,13 @@ package com.christophsturm.isolationchamber.postgresql.docker
 
 import com.christophsturm.isolationchamber.PostgresDb
 import com.christophsturm.isolationchamber.PostgresqlFactory
+import com.christophsturm.isolationchamber.SchemaHasher
 import io.vertx.kotlin.coroutines.coAwait
 import java.util.UUID
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.time.measureTimedValue
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 
 class DockerPostgresqlFactory(
     val dockerImage: String,
@@ -26,8 +30,9 @@ class DockerPostgresqlFactory(
         schema: String?
     ): PostgresDb = dockerContainer.preparePostgresDB(schema)
 
-    // drop all the returned dbs here.
-    override suspend fun cleanUp() {}
+    override suspend fun cleanUp() {
+        dockerContainer.cleanUp()
+    }
 }
 
 private class PostgresqlContainer(
@@ -35,6 +40,9 @@ private class PostgresqlContainer(
     private val databasePrefix: String,
     private val reuse: Boolean
 ) {
+    private val templateDatabases = ConcurrentHashMap<String, String>()
+    private val testDatabases = ConcurrentHashMap.newKeySet<String>()
+    private val templateCreationLocks = ConcurrentHashMap<String, Mutex>()
     private val dockerContainer: org.testcontainers.containers.PostgreSQLContainer<Nothing> =
         measureTimedValue {
             org.testcontainers.containers.PostgreSQLContainer<Nothing>(dockerImage).apply {
@@ -62,8 +70,59 @@ private class PostgresqlContainer(
             .using(vertx)
             .build()!!
 
-    suspend fun preparePostgresDB(schema: String?): PostgresDb =
-        postgresDb(databasePrefix, port, host, pool, vertx, connectOptions, schema)
+    suspend fun preparePostgresDB(schema: String?): PostgresDb {
+        val hash = SchemaHasher.getHash(schema)
+        val templateDbName = templateDatabases.computeIfAbsent(hash) { h ->
+            "template_${databasePrefix}_${h.take(8)}"
+        }
+
+        // Ensure template exists
+        val mutex = templateCreationLocks.computeIfAbsent(hash) { Mutex() }
+        mutex.withLock {
+            if (!doesDatabaseExist(templateDbName)) {
+                createTemplateDatabase(templateDbName, schema)
+            }
+        }
+
+        // Create test database from template
+        val uuid = UUID.randomUUID().toString().take(5)
+        val databaseName = "$databasePrefix$uuid".replace("-", "_")
+        testDatabases.add(databaseName)
+
+        pool.query("CREATE DATABASE $databaseName TEMPLATE $templateDbName").execute().coAwait()
+
+        return PostgresDbWithPool(databaseName, port, host, pool)
+    }
+
+    private suspend fun doesDatabaseExist(dbName: String): Boolean {
+        val result = pool.query("SELECT 1 FROM pg_database WHERE datname = '$dbName'").execute().coAwait()
+        return result.size() > 0
+    }
+
+    private suspend fun createTemplateDatabase(templateDbName: String, schema: String?) {
+        pool.query("CREATE DATABASE $templateDbName").execute().coAwait()
+
+        if (schema != null) {
+            val ddlConnection = io.vertx.pgclient.PgBuilder.client()
+                .using(vertx)
+                .connectingTo(io.vertx.pgclient.PgConnectOptions(connectOptions).setDatabase(templateDbName))
+                .build()!!
+            ddlConnection.query(schema).execute().coAwait()
+            ddlConnection.close().coAwait()
+        }
+    }
+
+    suspend fun cleanUp() {
+        // Drop all test databases
+        testDatabases.forEach { dbName ->
+            try {
+                pool.query("DROP DATABASE IF EXISTS $dbName").execute().coAwait()
+            } catch (_: Exception) {
+                // Ignore errors during cleanup
+            }
+        }
+        testDatabases.clear()
+    }
 }
 
 suspend fun postgresDb(
