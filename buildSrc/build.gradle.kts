@@ -18,7 +18,7 @@ dependencies {
     implementation("org.jetbrains.kotlin.plugin.power-assert:org.jetbrains.kotlin.plugin.power-assert.gradle.plugin:$kotlinVersion")
 
     implementation("com.adarshr:gradle-test-logger-plugin:4.0.0")
-    implementation("com.ncorti.ktfmt.gradle:plugin:0.19.0")
+    implementation("com.ncorti.ktfmt.gradle:plugin:0.24.0")
 
 }
 
