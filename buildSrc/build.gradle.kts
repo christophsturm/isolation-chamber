@@ -14,7 +14,7 @@ dependencies {
     implementation(kotlin("script-runtime"))
 
     implementation(kotlin("gradle-plugin", kotlinVersion))
-    implementation("info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.15.0")
+    implementation("info.solidsoft.gradle.pitest:gradle-pitest-plugin:1.19.0")
     implementation("org.jetbrains.kotlin.plugin.power-assert:org.jetbrains.kotlin.plugin.power-assert.gradle.plugin:$kotlinVersion")
 
     implementation("com.adarshr:gradle-test-logger-plugin:4.0.0")
